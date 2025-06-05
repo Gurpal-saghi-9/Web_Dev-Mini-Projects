@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day/Night Toggle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            transition: all 1s ease;
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 50%, #87CEEB 100%);
+            position: relative;
+        }
+
+        /* Day Theme (Default) */
+        body.day {
+            background: linear-gradient(135deg, #87CEEB 0%, #98D8E8 50%, #87CEEB 100%);
+            color: #333;
+        }
+
+        /* Night Theme */
+        body.night {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: #fff;
+        }
+
+        /* Sun */
+        .sun {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #FFD700 40%, #FFA500 70%);
+            border-radius: 50%;
+            box-shadow: 0 0 50px #FFD700;
+            opacity: 1;
+            transition: all 1s ease;
+            animation: sunGlow 3s infinite alternate;
+        }
+
+        @keyframes sunGlow {
+            0% { box-shadow: 0 0 50px #FFD700; }
+            100% { box-shadow: 0 0 80px #FFD700, 0 0 120px #FFA500; }
+        }
+
+        .sun::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: repeating-conic-gradient(
+                from 0deg,
+                transparent 0deg 8deg,
+                #FFD700 8deg 10deg
+            );
+            border-radius: 50%;
+            animation: sunRotate 20s linear infinite;
+        }
+
+        @keyframes sunRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Moon */
+        .moon {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #E6E6FA 0%, #C0C0C0 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(230, 230, 250, 0.5);
+            opacity: 0;
+            transition: all 1s ease;
+        }
+
+        .moon::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 12px;
+            height: 12px;
+            background: #B0B0B0;
+            border-radius: 50%;
+            box-shadow: 
+                20px 8px 0 -2px #B0B0B0,
+                35px 15px 0 -4px #B0B0B0,
+                10px 25px 0 -3px #B0B0B0;
+        }
+
+        /* Stars */
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            animation: twinkle 2s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .star:nth-child(1) { top: 20%; left: 10%; width: 8px; height: 8px; animation-delay: 0s; }
+        .star:nth-child(2) { top: 15%; left: 80%; width: 6px; height: 6px; animation-delay: 0.5s; }
+        .star:nth-child(3) { top: 30%; left: 20%; width: 4px; height: 4px; animation-delay: 1s; }
+        .star:nth-child(4) { top: 25%; left: 70%; width: 7px; height: 7px; animation-delay: 1.5s; }
+        .star:nth-child(5) { top: 40%; left: 85%; width: 5px; height: 5px; animation-delay: 2s; }
+        .star:nth-child(6) { top: 50%; left: 15%; width: 6px; height: 6px; animation-delay: 0.3s; }
+        .star:nth-child(7) { top: 60%; left: 75%; width: 4px; height: 4px; animation-delay: 0.8s; }
+        .star:nth-child(8) { top: 70%; left: 30%; width: 8px; height: 8px; animation-delay: 1.3s; }
+
+        /* Clouds */
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 1;
+            transition: opacity 1s ease;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            animation: float 20s infinite linear;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+        }
+
+        .cloud1 {
+            width: 80px;
+            height: 40px;
+            top: 20%;
+            left: -100px;
+        }
+
+        .cloud1::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 60px;
+            height: 30px;
+            top: 40%;
+            left: -80px;
+            animation-delay: -10s;
+        }
+
+        .cloud2::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 5px;
+        }
+
+        .cloud2::after {
+            width: 50px;
+            height: 30px;
+            top: -10px;
+            right: 5px;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 120px;
+            height: 60px;
+            background: #ddd;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            box-shadow: inset 0 2px 15px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch::before {
+            content: '☀️';
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            transform: translateY(-50%);
+            font-size: 24px;
+            transition: all 0.5s ease;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.5s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .toggle-checkbox {
+            display: none;
+        }
+
+        .toggle-checkbox:checked + .toggle-switch {
+            background: #2c3e50;
+        }
+
+        .toggle-checkbox:checked + .toggle-switch::before {
+            content: '🌙';
+            left: 75px;
+        }
+
+        .toggle-checkbox:checked + .toggle-switch::after {
+            transform: translateX(60px);
+            background: #34495e;
+        }
+
+        /* Night mode styles */
+        body.night .sun {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        body.night .moon {
+            opacity: 1;
+            animation: moonGlow 4s infinite alternate;
+        }
+
+        @keyframes moonGlow {
+            0% { box-shadow: 0 0 30px rgba(230, 230, 250, 0.5); }
+            100% { box-shadow: 0 0 50px rgba(230, 230, 250, 0.8); }
+        }
+
+        body.night .stars {
+            opacity: 1;
+        }
+
+        body.night .clouds {
+            opacity: 0.3;
+        }
+
+        body.night .cloud {
+            background: rgba(100, 100, 100, 0.3);
+        }
+
+        body.night .cloud::before,
+        body.night .cloud::after {
+            background: rgba(100, 100, 100, 0.3);
+        }
+
+        .toggle-label {
+            display: block;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Content */
+        .content {
+            position: absolute;
+            bottom: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            transition: all 1s ease;
+        }
+
+        body.night .content {
+            background: rgba(0,0,0,0.3);
+        }
+
+        .content h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .content p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="day">
+    <!-- Sun -->
+    <div class="sun"></div>
+    
+    <!-- Moon -->
+    <div class="moon"></div>
+    
+    <!-- Stars -->
+    <div class="stars">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    
+    <!-- Clouds -->
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+    </div>
+    
+    <!-- Toggle Switch -->
+    <div class="toggle-container">
+        <span class="toggle-label">Toggle Day/Night</span>
+        <input type="checkbox" id="themeToggle" class="toggle-checkbox">
+        <label for="themeToggle" class="toggle-switch"></label>
+    </div>
+    
+    <!-- Content -->
+    <div class="content">
+        <h2 id="greeting">Good Day!</h2>
+        <p id="description">Enjoy the beautiful sunny weather</p>
+    </div>
+
+    <script>
+        const toggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const greeting = document.getElementById('greeting');
+        const description = document.getElementById('description');
+
+        toggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Night mode
+                body.className = 'night';
+                greeting.textContent = 'Good Night!';
+                description.textContent = 'Look at the beautiful stars and moon';
+            } else {
+                // Day mode
+                body.className = 'day';
+                greeting.textContent = 'Good Day!';
+                description.textContent = 'Enjoy the beautiful sunny weather';
+            }
+        });
+    </script>
+</body>
+</html>
